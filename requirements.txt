@@ -1,1 +1,22 @@
 Django==4.1.3
+django-haystack
+djangorestframework
+django-filter
+pandas
+scikit-learn
+surprise
+numpy==1.26.4  
+torch
+gensim
+node2vec
+Whoosh 
+scrapy 
+python-Levenshtein
+# scrapy-playwright 
+# scrapy-rotating-proxies 
+# selenium 
+# webdriver-manager 
+
+# tqdm 
+# transformers 
+# sentence-transformers 

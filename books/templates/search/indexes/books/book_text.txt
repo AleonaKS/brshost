@@ -1,0 +1,4 @@
+{{ object.title }} 
+{% for author in object.author.all %}
+{{ author.name }}
+{% endfor %}

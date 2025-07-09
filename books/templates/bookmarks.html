@@ -1,0 +1,158 @@
+
+{% extends "base.html" %}
+{% block title %}{{title}}{% endblock %}
+{% block content %}
+<h1>Закладки</h1>
+{% if books %}
+<div class="book-grid">
+    {% for book in books %}
+    <div class="book-card">
+        <a href="{% url 'book_detail' book_id=book.id %}">
+            <img src="{{ book.image_link }}" alt="{{ book.title }}">
+        </a>
+      <div class="title">{{ book.title }}</div>
+      <div class="author">
+        {% for author in book.author.all %}
+          {{ author.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </div>
+       
+    <div class="actions">
+        <!-- Кнопка "В корзину" -->
+        <button 
+            class="add-to-cart-btn" 
+            data-book-id="{{ book.id }}"
+            type="button"
+            >
+            🛒 В корзину
+        </button>
+
+        <!-- Кнопка "В закладки" -->
+        <button 
+            class="add-to-bookmarks-btn" 
+            data-book-id="{{ book.id }}"
+            type="button"
+            >
+            🔖 В закладки
+        </button>
+    </div>
+    </div>
+    {% empty %}
+    <p>Книги не найдены.</p>
+{% endfor %}
+  </div>
+{% endif %}
+
+ 
+</div>
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const csrftoken = '{{ csrf_token }}';
+
+    function postData(url = '', data = {}) {
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify(data),
+            credentials: 'include',
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Ошибка сети');
+            return response.json();
+        });
+    }
+
+    // Для хранения состояния каждой книги 
+    const cartState = new Map();
+    const bookmarksState = new Map();
+
+    // Обновление кнопки корзины
+    function updateCartBtn(button, inCart) {
+        if (inCart) {
+            button.textContent = 'Удалить из корзины';
+            button.classList.add('active');
+        } else {
+            button.textContent = '🛒 В корзину';
+            button.classList.remove('active');
+        }
+    }
+
+    // Обновление кнопки закладок
+    function updateBookmarksBtn(button, inBookmarks) {
+        if (inBookmarks) {
+            button.textContent = 'Удалить из закладок';
+            button.classList.add('active');
+        } else {
+            button.textContent = '🔖 В закладки';
+            button.classList.remove('active');
+        }
+    }
+
+    // Обработчик для кнопок корзины
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        const bookId = button.dataset.bookId;
+
+        // Инициализация состояния (по умолчанию false)
+        cartState.set(bookId, false);
+        updateCartBtn(button, false);
+
+        button.addEventListener('click', () => {
+            const inCart = cartState.get(bookId);
+            if (!inCart) {
+                postData('/api/cart/add/', { book_id: bookId })
+                    .then(() => {
+                        cartState.set(bookId, true);
+                        updateCartBtn(button, true);
+                        alert('Книга добавлена в корзину');
+                    })
+                    .catch(() => alert('Ошибка при добавлении в корзину'));
+            } else {
+                postData('/api/cart/remove/', { book_id: bookId })
+                    .then(() => {
+                        cartState.set(bookId, false);
+                        updateCartBtn(button, false);
+                        alert('Книга удалена из корзины');
+                    })
+                    .catch(() => alert('Ошибка при удалении из корзины'));
+            }
+        });
+    });
+
+    // Обработчик для кнопок закладок
+    document.querySelectorAll('.add-to-bookmarks-btn').forEach(button => {
+        const bookId = button.dataset.bookId;
+
+        bookmarksState.set(bookId, false);
+        updateBookmarksBtn(button, false);
+
+        button.addEventListener('click', () => {
+            const inBookmarks = bookmarksState.get(bookId);
+            if (!inBookmarks) {
+                postData('/api/bookmarks/add/', { book_id: bookId })
+                    .then(() => {
+                        bookmarksState.set(bookId, true);
+                        updateBookmarksBtn(button, true);
+                        alert('Книга добавлена в закладки');
+                    })
+                    .catch(() => alert('Ошибка при добавлении в закладки'));
+            } else {
+                postData('/api/bookmarks/remove/', { book_id: bookId })
+                    .then(() => {
+                        bookmarksState.set(bookId, false);
+                        updateBookmarksBtn(button, false);
+                        alert('Книга удалена из закладок');
+                    })
+                    .catch(() => alert('Ошибка при удалении из закладок'));
+            }
+        });
+    });
+});
+
+</script>
+
+
+{% endblock %}

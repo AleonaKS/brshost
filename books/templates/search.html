@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<!-- <h1>Результаты поиска по запросу "{{ query }}"</h1> -->
+<div class="book-grid">
+    {% for book in books %}
+    <div class="book-card">
+        <a href="{% url 'book_detail' book_id=book.id %}">
+            <img src="{{ book.image_link }}" alt="{{ book.title }}">
+        </a>
+      <div class="title">{{ book.title }}</div>
+      <div class="author">
+        {% for author in book.author.all %}
+          {{ author.name }}{% if not forloop.last %}, {% endif %}
+        {% endfor %}
+      </div>
+      
+    </div>
+    {% empty %}
+    <p>Книги не найдены.</p>
+{% endfor %}
+  </div>
+ 
+{% endblock %}
+

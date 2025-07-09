@@ -1,0 +1,381 @@
+{% extends 'base.html' %} 
+ 
+{% block content %} 
+    {% if user.is_authenticated %}
+        <p>Личный кабинет, {{ user.username }}!</p>
+
+        <!-- <h2>Ваши оценки</h2>
+        {% include 'book_list.html' with books=books %}  -->
+
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Выйти</button>
+        </form>
+
+
+
+
+<div class="container mt-4">
+    <h2>Личный кабинет — настройки предпочтений</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        <!-- Любимые авторы -->
+
+<div>
+  {# --- Любимые авторы --- #}
+  <div class="toggle-button" role="button" tabindex="0" aria-expanded="false" aria-controls="favoriteAuthorsBlock">
+    Любимые авторы <span class="arrow">▼</span>
+  </div>
+  <div id="favoriteAuthorsBlock" class="collapsible-content">
+    <input type="text" class="form-control mb-2 search-input" placeholder="Поиск авторов..." data-target="favoriteAuthorsCheckboxes" autocomplete="off" aria-label="Поиск авторов" />
+    <div id="favoriteAuthorsCheckboxes" class="checkbox-multi-col">
+      {% with checked=form.favorite_authors.value %}
+        {% for checkbox in form.favorite_authors %}
+          <label class="form-check-label d-block" data-name="{{ checkbox.choice_label|lower }}">
+            {{ checkbox.tag }} {{ checkbox.choice_label }}
+          </label>
+        {% endfor %}
+      {% endwith %}
+    </div>
+  </div>
+
+  {# Выпадающий список с выбранными авторами и score #}
+  <details class="mt-2">
+    <summary>Ваши любимые авторы и их score</summary>
+    <ul>
+      {% for fav in userpreferences.favoriteauthors_set.all %}
+        <li>
+          {{ fav.author.name }}
+          <span class="score-stars">
+            {% for i in "12345678910"|slice:":10" %}
+  {% if forloop.counter <= fav.score|floatformat:0 %}
+    <span class="star filled-green">★</span>
+  {% else %}
+    <span class="star">☆</span>
+  {% endif %}
+{% endfor %}
+
+          </span>
+        </li>
+      {% empty %}
+        <li>Нет выбранных авторов</li>
+      {% endfor %}
+    </ul>
+  </details>
+</div>
+
+<hr>
+
+<div>
+  {# --- Любимые жанры --- #}
+  <div class="toggle-button" role="button" tabindex="0" aria-expanded="false" aria-controls="favoriteGenresBlock">
+    Любимые жанры <span class="arrow">▼</span>
+  </div>
+  <div id="favoriteGenresBlock" class="collapsible-content">
+    <input type="text" class="form-control mb-2 search-input" placeholder="Поиск жанров..." data-target="favoriteGenresCheckboxes" autocomplete="off" aria-label="Поиск жанров" />
+    <div id="favoriteGenresCheckboxes" class="checkbox-multi-col">
+      {% with checked=form.favorite_genres.value %}
+        {% for checkbox in form.favorite_genres %}
+          <label class="form-check-label d-block" data-name="{{ checkbox.choice_label|lower }}">
+            {{ checkbox.tag }} {{ checkbox.choice_label }}
+          </label>
+        {% endfor %}
+      {% endwith %}
+    </div>
+  </div>
+
+  <details class="mt-2">
+    <summary>Ваши любимые жанры и их score</summary>
+    <ul>
+      {% for fav in userpreferences.favoritegenres_set.all %}
+        <li>
+          {{ fav.genre.name }}
+          <span class="score-stars">
+            {% for i in "12345678910"|slice:":10" %}
+              {% if forloop.counter <= fav.score|floatformat:0 %}
+
+                <span class="star filled-green">★</span>
+              {% else %}
+                <span class="star">☆</span>
+              {% endif %}
+            {% endfor %}
+          </span>
+        </li>
+      {% empty %}
+        <li>Нет выбранных жанров</li>
+      {% endfor %}
+    </ul>
+  </details>
+</div>
+
+<hr>
+
+<div>
+  {# --- Любимые теги --- #}
+  <div class="toggle-button" role="button" tabindex="0" aria-expanded="false" aria-controls="favoriteTagsBlock">
+    Любимые теги <span class="arrow">▼</span>
+  </div>
+  <div id="favoriteTagsBlock" class="collapsible-content">
+    <input type="text" class="form-control mb-2 search-input" placeholder="Поиск тегов..." data-target="favoriteTagsCheckboxes" autocomplete="off" aria-label="Поиск тегов" />
+    <div id="favoriteTagsCheckboxes" class="checkbox-multi-col">
+      {% with checked=form.favorite_tags.value %}
+        {% for checkbox in form.favorite_tags %}
+          <label class="form-check-label d-block" data-name="{{ checkbox.choice_label|lower }}">
+            {{ checkbox.tag }} {{ checkbox.choice_label }}
+          </label>
+        {% endfor %}
+      {% endwith %}
+    </div>
+  </div>
+
+  <details class="mt-2">
+    <summary>Ваши любимые теги и их score</summary>
+    <ul>
+      {% for fav in userpreferences.favoritetags_set.all %}
+        <li>
+          {{ fav.tag.name }}
+          <span class="score-stars">
+            {% for i in "12345678910"|slice:":10" %}
+              {% if forloop.counter <= fav.score|floatformat:0 %}
+
+                <span class="star filled-green">★</span>
+              {% else %}
+                <span class="star">☆</span>
+              {% endif %}
+            {% endfor %}
+          </span>
+        </li>
+      {% empty %}
+        <li>Нет выбранных тегов</li>
+      {% endfor %}
+    </ul>
+  </details>
+</div>
+
+<hr>
+
+<div>
+  {# --- Нелюбимые жанры --- #}
+  <div class="toggle-button" role="button" tabindex="0" aria-expanded="false" aria-controls="dislikedGenresBlock">
+    Нелюбимые жанры <span class="arrow">▼</span>
+  </div>
+  <div id="dislikedGenresBlock" class="collapsible-content">
+    <input type="text" class="form-control mb-2 search-input" placeholder="Поиск жанров..." data-target="dislikedGenresCheckboxes" autocomplete="off" aria-label="Поиск жанров" />
+    <div id="dislikedGenresCheckboxes" class="checkbox-multi-col">
+      {% with checked=form.disliked_genres.value %}
+        {% for checkbox in form.disliked_genres %}
+          <label class="form-check-label d-block" data-name="{{ checkbox.choice_label|lower }}">
+            {{ checkbox.tag }} {{ checkbox.choice_label }}
+          </label>
+        {% endfor %}
+      {% endwith %}
+    </div>
+  </div>
+
+  <details class="mt-2">
+    <summary>Ваши нелюбимые жанры и их score</summary>
+    <ul>
+      {% for dis in userpreferences.dislikedgenres_set.all %}
+        <li>
+          {{ dis.genre.name }}
+          <span class="score-stars">
+            {% for i in "12345678910"|slice:":10" %}
+             {% if forloop.counter <= fav.score|floatformat:0 %}
+
+                <span class="star filled-red">★</span>
+              {% else %}
+                <span class="star">☆</span>
+              {% endif %}
+            {% endfor %}
+          </span>
+        </li>
+      {% empty %}
+        <li>Нет выбранных жанров</li>
+      {% endfor %}
+    </ul>
+  </details>
+</div>
+
+<hr>
+
+<div>
+  {# --- Нелюбимые теги --- #}
+  <div class="toggle-button" role="button" tabindex="0" aria-expanded="false" aria-controls="dislikedTagsBlock">
+    Нелюбимые теги <span class="arrow">▼</span>
+  </div>
+  <div id="dislikedTagsBlock" class="collapsible-content">
+    <input type="text" class="form-control mb-2 search-input" placeholder="Поиск тегов..." data-target="dislikedTagsCheckboxes" autocomplete="off" aria-label="Поиск тегов" />
+    <div id="dislikedTagsCheckboxes" class="checkbox-multi-col">
+      {% with checked=form.disliked_tags.value %}
+        {% for checkbox in form.disliked_tags %}
+          <label class="form-check-label d-block" data-name="{{ checkbox.choice_label|lower }}">
+            {{ checkbox.tag }} {{ checkbox.choice_label }}
+          </label>
+        {% endfor %}
+      {% endwith %}
+    </div>
+  </div>
+
+  <details class="mt-2">
+    <summary>Ваши нелюбимые теги и их score</summary>
+    <ul>
+      {% for dis in userpreferences.dislikedtags_set.all %}
+        <li>
+          {{ dis.tag.name }}
+          <span class="score-stars">
+            {% for i in "12345678910"|slice:":10" %}
+             {% if forloop.counter <= fav.score|floatformat:0 %}
+
+                <span class="star filled-red">★</span>
+              {% else %}
+                <span class="star">☆</span>
+              {% endif %}
+            {% endfor %}
+          </span>
+        </li>
+      {% empty %}
+        <li>Нет выбранных тегов</li>
+      {% endfor %}
+    </ul>
+  </details>
+</div>
+
+    
+
+    <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
+  </form>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('searchFavoriteAuthors');
+    const container = document.getElementById('favoriteAuthorsContainer');
+
+    input.addEventListener('input', function() {
+      const filter = this.value.trim().toLowerCase();
+ 
+      container.querySelectorAll('label').forEach(label => {
+        const text = label.getAttribute('data-author-name');
+        if (text.includes(filter)) {
+          label.style.display = '';
+        } else {
+          label.style.display = 'none';
+        }
+      });
+    });
+  });
+  
+ document.querySelectorAll('.toggle-button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const content = document.getElementById(btn.getAttribute('aria-controls'));
+    const isOpen = content.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen);
+    btn.querySelector('.arrow').textContent = isOpen ? '▲' : '▼';
+  });
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      btn.click();
+    }
+  });
+});
+
+document.querySelectorAll('.search-input').forEach(input => {
+  const container = document.getElementById(input.dataset.target);
+  input.addEventListener('input', () => {
+    const filter = input.value.toLowerCase();
+    container.querySelectorAll('label').forEach(label => {
+      const text = label.getAttribute('data-name');
+      label.style.display = text.includes(filter) ? '' : 'none';
+    });
+  });
+});
+</script>
+
+{% endif %}
+
+
+<style>
+.score-stars {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+}
+.score-stars .star {
+  font-size: 1rem;
+  color: gray;
+}
+.score-stars .star.filled-green {
+  color: #28a745;  
+}
+.score-stars .star.filled-red {
+  color: #dc3545;  
+}
+
+
+  .collapsible-content {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+  .collapsible-content.open {
+    max-height: 1000px;  
+  }
+  .toggle-button {
+    cursor: pointer;
+    user-select: none;
+  }
+    
+.checked-option {
+  font-weight: 600;
+  background-color: #d0f0d0;
+  border-radius: 3px;
+  padding: 2px 5px;
+}
+
+
+
+.checkbox-multi-col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 колонки */
+  gap: 10px;
+  max-height: 300px;  
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.checkbox-multi-col label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  padding: 2px 5px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.checkbox-multi-col label:hover {
+  background-color: #f0f0f0;
+}
+
+.checkbox-multi-col input[type="checkbox"] {
+  margin-right: 6px;
+  cursor: pointer;
+}
+</style>
+
+
+{% endblock %}

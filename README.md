@@ -1,106 +1,66 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fdjango&demo-title=Django%20%2B%20Vercel&demo-description=Use%20Django%204%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fdjango-template.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994241/random/django.png)
+# Инструкция по запуску проекта `books_site`
 
-# Django + Vercel
+Все команды выполнять из корневой папки проекта (там, где находится `manage.py`).
+Перед запуском убедитесь, что активировано виртуальное окружение и установлены все зависимости из requirements.txt.
+---
 
-This example shows how to use Django 4 on Vercel with Serverless Functions using the [Python Runtime](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python).
+## 1. Миграции базы данных
 
-## Demo
-
-https://django-template.vercel.app/
-
-## How it Works
-
-Our Django application, `example` is configured as an installed application in `api/settings.py`:
-
-```python
-# api/settings.py
-INSTALLED_APPS = [
-    # ...
-    'example',
-]
+```bash
+python manage.py makemigrations
+python manage.py migrate
 ```
 
-We allow "\*.vercel.app" subdomains in `ALLOWED_HOSTS`, in addition to 127.0.0.1:
+---
 
-```python
-# api/settings.py
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
+## 2. Сбор данных и заполнение бд
+
+Для сбора данных с логированием выполняются два основных шага:
+1) запуск Scrapy-паука books.py для парсинга книг:
+```bash
+cd scraper/parsing_books/spiders
+scrapy crawl books
+```
+2) запуск скрипта reviews.py для парсинга отзывов:
+```bash
+python3 reviews.py
+```
+Запускайте эти команды из папки scraper/parsing_books/spiders, чтобы корректно работали импорты и настройки Scrapy.
+
+Далее из корневой папки проекта на основе полученных данных (в формате json) происходит создание записей в базе данных: 
+```bash
+python3 import_books.py
+python3 import_reviews.py
+python3 user_preferences.py
 ```
 
-The `wsgi` module must use a public variable named `app` to expose the WSGI application:
+Для удобства и автоматизации эти шаги объединены в кастомную Django-команду parsing, которую можно запускать из корня проекта:
+```bash
+python manage.py parsing
+```
+---
 
-```python
-# api/wsgi.py
-app = get_wsgi_application()
+## 3. Индексация поисковых запросов
+
+Для обновления поискового индекса используется Django Haystack, чтобы пересоздать индекс и обновить данные для поиска, выполните команду:
+```bash
+python manage.py rebuild_index
 ```
 
-The corresponding `WSGI_APPLICATION` setting is configured to use the `app` variable from the `api.wsgi` module:
-
-```python
-# api/settings.py
-WSGI_APPLICATION = 'api.wsgi.app'
+## 4. Создание рекомендаций
+Сгенерируйте рекомендательные модели для пользователей с помощью:
+```bash
+python manage.py generate_recommendations
 ```
 
-There is a single view which renders the current time in `example/views.py`:
-
-```python
-# example/views.py
-from datetime import datetime
-
-from django.http import HttpResponse
-
-
-def index(request):
-    now = datetime.now()
-    html = f'''
-    <html>
-        <body>
-            <h1>Hello from Vercel!</h1>
-            <p>The current time is { now }.</p>
-        </body>
-    </html>
-    '''
-    return HttpResponse(html)
+## 5. Расчет метрик
+Выполните подсчёт метрик:
+```bash
+python manage.py calculate_metrics
 ```
 
-This view is exposed a URL through `example/urls.py`:
-
-```python
-# example/urls.py
-from django.urls import path
-
-from example.views import index
-
-
-urlpatterns = [
-    path('', index),
-]
-```
-
-Finally, it's made accessible to the Django server inside `api/urls.py`:
-
-```python
-# api/urls.py
-from django.urls import path, include
-
-urlpatterns = [
-    ...
-    path('', include('example.urls')),
-]
-```
-
-This example uses the Web Server Gateway Interface (WSGI) with Django to enable handling requests on Vercel with Serverless Functions.
-
-## Running Locally
-
+## 6. Запуск сервера разработки
+Запустите локальный сервер Django:
 ```bash
 python manage.py runserver
 ```
-
-Your Django application is now available at `http://localhost:8000`.
-
-## One-Click Deploy
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fdjango&demo-title=Django%20%2B%20Vercel&demo-description=Use%20Django%204%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fdjango-template.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994241/random/django.png)

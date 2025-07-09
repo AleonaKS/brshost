@@ -1,0 +1,102 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой сайт</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="top-bar">
+        <a href="{% url 'home' %}" class="icons" aria-label="Домой"><span class="fas fa-home"></span>  
+        </a>
+        <a href="#" class="catalog"><span class="fa-solid fa-bars"></span>Каталог</a>
+ 
+        <div class="search-bar" style="position: relative;">
+            <form method="get" action="{% url 'search_books' %}" autocomplete="off">
+                <input 
+                    type="text" 
+                    id="search-input"
+                    name="q" 
+                    placeholder="Найти..." 
+                    value="{{ request.GET.q|default:'' }}" 
+                    autocomplete="off">
+                <span class="search-icon" aria-hidden="true">
+                    <span class="fas fa-search"></span>
+                </span>
+            </form>
+            <div id="autocomplete-results" class="autocomplete-box"></div>
+        </div>
+
+        <a href="{% url 'cart' %}" class="icons" aria-label="Корзина">
+        <span class="fa-solid fa-cart-shopping"></span></a>
+        <a href="{% url 'bookmarks' %}" class="icons" aria-label="Закладки">
+        <span class="fa-regular fa-bookmark"></span></a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="icons" aria-label="Выйти"><span class="fa-regular fa-user"></span></a>
+        {% else %}
+        <a href="#" class="icons" aria-label="Логин" id="loginBtn"><span class="fa-regular fa-user"></span></a>
+        {% endif %}
+    </div>
+
+<!-- Модальное окно авторизации -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span> 
+        <div class="form-navigation">
+            <a href="#" id="showLogin" class="active">ВХОД</a>
+            <a href="#" id="showRegister">РЕГИСТРАЦИЯ</a>
+        </div>
+        <!-- Форма входа -->
+        <div id="loginFormContainer"> 
+            <form method="post" action="{% url 'login' %}" id="loginForm">
+                {% csrf_token %}
+                <div class="input-container">
+                    <input type="login" name="username" id="username" placeholder="Логин" required>
+                </div>
+                <div class="input-container">
+                    <input type="password" name="password" id="password" placeholder="Пароль" required>
+                </div> 
+                <div class="button-container">
+                    <button form="loginForm" type="submit">Войти</button> 
+                </div>
+            </form> 
+        </div>
+        <!-- Форма регистрации -->
+        <div id="registrationFormContainer" style="display: none;">
+            <form method="post" action="{% url 'registration' %}" id="registrationForm">
+                {% csrf_token %}
+                <div class="input-container">
+                    <input type="login" name="username" id="reg_username" placeholder="Логин" required>
+                </div>
+                <div class="input-container">
+                    <input type="password" name="password1" id="reg_password" placeholder="Пароль" required>
+                </div>
+                <div class="input-container">
+                    <input type="password" name="password2" id="confirm_password" placeholder="Подтвердите пароль" required>
+                </div>
+                <div class="button-container"> 
+                    <button form="registrationForm" type="submit">Зарегистрироваться</button>
+                </div>
+            </form> 
+        </div>
+    </div>
+</div>
+
+<script>
+    const loginUrl = "{% url 'login' %}";
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'main.js' %}"></script>
+
+        <div class="content">
+    {% block content %}
+    {% endblock %}
+</div>
+
+
+</body>
+</html>

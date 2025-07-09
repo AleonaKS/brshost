@@ -1,0 +1,24 @@
+{% extends 'base.html' %}  
+
+ {% block content %} 
+     {% if user.is_authenticated %}
+     <h1>Добро пожаловать на главную страницу, {{ user.username }}!</h1> 
+     {% endif %}
+
+   <h1>Персональные рекомендации</h1>  
+   {% include 'book_list.html' with books=recommended_books %}
+   
+   <h1>Популярные книги</h1>  
+   {% include 'book_list.html' with books=popular_books %}
+
+    <h1>Новинки</h1>  
+   {% include 'book_list.html' with books=new_books %}
+
+   <h1>Скоро</h1>  
+   {% include 'book_list.html' with books=soon_books %}
+
+   <h1>Последние просмотренные книги</h1>  
+   {% include 'book_list.html' with books=last_books %}
+</div>
+
+{% endblock %}
