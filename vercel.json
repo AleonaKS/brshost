@@ -1,8 +1,13 @@
 {
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "books_site/wsgi.py"
-    }
-  ]
+    "builds": [{
+        "src": "books_site/wsgi.py",
+        "use": "@vercel/python",
+        "config": {"runtime": "python3.9"}
+    }],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "desc": "books_site/wsgi.py"
+        }
+    ]
 }
