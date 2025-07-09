@@ -1,15 +1,19 @@
 {
   "version": 2,
-    "builds": [{
-        "src": "books_site/wsgi.py",
-        "use": "@vercel/python",
-        "config": {"maxLambdaSize": "15mb", "runtime": "python3.9"}
-    }],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "desc": "books_site/wsgi.py"
-        }
-    ]
+  "builds": [
+    {
+      "src": "books_site/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.9"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "books_site/wsgi.py"
+    }
+  ]
 }
- 
