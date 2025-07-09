@@ -1,8 +1,9 @@
 {
+  "version": 2,
     "builds": [{
         "src": "books_site/wsgi.py",
         "use": "@vercel/python",
-        "config": {"runtime": "python3.9"}
+        "config": {"maxLambdaSize": "15mb", "runtime": "python3.9"}
     }],
     "routes": [
         {
@@ -11,3 +12,4 @@
         }
     ]
 }
+ 
