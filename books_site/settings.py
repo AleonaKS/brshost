@@ -88,7 +88,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-WSGI_APPLICATION = 'books_site.wsgi.app'
+WSGI_APPLICATION = 'books_site.wsgi.application'
 
 
 # Database

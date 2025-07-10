@@ -22,7 +22,7 @@ def compute_and_store_word2vec_vectors(vector_size=100, window=5, min_count=2, w
 
         BookVector.objects.update_or_create(
             book=book,
-            defaults={'vector': book_vector.tolist()}
+            defaults={'w2v_vector': book_vector.tolist()}
         ) 
 
 
